@@ -22,7 +22,7 @@ jobs:
       attestations: write
       id-token: write
     outputs:
-      image-tag: ${{ steps.meta.outputs.tag }}
+      image-tag: ${{ steps.meta.outputs.tags }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
