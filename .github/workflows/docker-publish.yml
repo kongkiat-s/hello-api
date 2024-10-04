@@ -58,7 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: git clone "https://$TOKEN@github.com/kongkiat-s/hello-api-deploy
+      - run: git clone "https://$TOKEN@github.com/kongkiat-s/hello-api-deploy"
         env:
           TOKEN: ${{ secrets.TOKEN }}
       - run: |
