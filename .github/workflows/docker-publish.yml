@@ -22,7 +22,7 @@ jobs:
       attestations: write
       id-token: write
     outputs:
-      image-tag: ${{ steps.meta.outputs.tags }}
+      tag: ${{ steps.meta.outputs.tags }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -62,8 +62,8 @@ jobs:
         env:
           TOKEN: ${{ secrets.TOKEN }}
       - run: |
-          docker run -u $(id -u):$(id -g) -v $(pwd):/src -w /src -t registry.k8s.io/kustomize/kustomize:v5.0.0 edit set image hello-api=ksangdej/hello-api:${{ needs.build-and-publish.outputs.image-tag }}
+          docker run -u $(id -u):$(id -g) -v $(pwd):/src -w /src -t registry.k8s.io/kustomize/kustomize:v5.0.0 edit set image hello-api=ksangdej/hello-api:${{ needs.build-and-publish.outputs.tag }}
           git config --global user.email 'kong_ce@hotmail.com'
           git config --global user.name 'kongkiat-s'
-          git diff --exit-code && echo 'Already deployed' || (git commit -am 'Upgrade argocd to ${{ needs.build-and-publish.outputs.image-tag }}' && git push)
+          git diff --exit-code && echo 'Already deployed' || (git commit -am 'Upgrade argocd to ${{ needs.build-and-publish.outputs.tag }}' && git push)
         working-directory: hello-api-deploy/Kustomize/dev
