@@ -14,17 +14,15 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
-
+  build-and-publish:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
-      # This is used to complete the identity challenge
-      # with sigstore/fulcio when running outside of PRs.
       attestations: write
       id-token: write
-
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tag}}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -50,3 +48,22 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    needs:
+      - build-and-publish
+    permissions:
+      contents: write 
+      packages: write 
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: git clone "https://$TOKEN@github.com/kongkiat-s/hello-api-deploy
+        env:
+          TOKEN: ${{ secrets.TOKEN }}
+      - run: |
+          docker run -u $(id -u):$(id -g) -v $(pwd):/src -w /src -t registry.k8s.io/kustomize/kustomize:v5.0.0 edit set image hello-api=ksangdej/hello-api:${{ needs.build-and-publish.outputs.image-tag }}
+          git config --global user.email 'kong_ce@hotmail.com'
+          git config --global user.name 'kongkiat-s'
+          git diff --exit-code && echo 'Already deployed' || (git commit -am 'Upgrade argocd to ${{ needs.build-and-publish.outputs.image-tag }}' && git push)
+        working-directory: Kustomize/dev
