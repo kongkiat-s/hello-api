@@ -66,4 +66,4 @@ jobs:
           git config --global user.email 'kong_ce@hotmail.com'
           git config --global user.name 'kongkiat-s'
           git diff --exit-code && echo 'Already deployed' || (git commit -am 'Upgrade argocd to ${{ needs.build-and-publish.outputs.image-tag }}' && git push)
-        working-directory: Kustomize/dev
+        working-directory: hello-api-deploy/Kustomize/dev
